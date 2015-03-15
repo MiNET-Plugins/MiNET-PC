@@ -20,9 +20,9 @@ namespace MiNETPC.Packages
 		public override void Write()
 		{
 			Buffer.WriteVarInt(SendId);
-			Buffer.WriteDouble(PluginGlobals.Level.SpawnPoint.X);
-			Buffer.WriteDouble(PluginGlobals.Level.SpawnPoint.Y - 1.62);
-			Buffer.WriteDouble(PluginGlobals.Level.SpawnPoint.Z);
+			Buffer.WriteDouble(PluginGlobals.Level[0].SpawnPoint.X);
+			Buffer.WriteDouble(PluginGlobals.Level[0].SpawnPoint.Y - 1.62);
+			Buffer.WriteDouble(PluginGlobals.Level[0].SpawnPoint.Z);
 			Buffer.WriteFloat(0f);
 			Buffer.WriteFloat(0f);
 			Buffer.WriteByte(111);

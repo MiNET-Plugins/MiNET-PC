@@ -24,7 +24,7 @@ namespace MiNETPC.Packages
 		{
 			new Animation(Client) {AnimationId = 0, TargetPlayer = Client.Player}.Broadcast(false, Client.Player);
 
-			PluginGlobals.Level.RelayBroadcast(new McpeAnimate()
+			PluginGlobals.Level[0].RelayBroadcast(new McpeAnimate()
 			{
 				actionId = 1,
 				entityId = PluginGlobals.PcidOffset + Client.Player.EntityId

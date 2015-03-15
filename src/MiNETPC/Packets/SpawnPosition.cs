@@ -17,7 +17,7 @@ namespace MiNETPC.Packages
 
 		public override void Write()
 		{
-			Vector3 D = PluginGlobals.Level.SpawnPoint;
+			Vector3 D = PluginGlobals.Level[0].SpawnPoint;
 			Buffer.WriteVarInt(SendId);
 			Buffer.WritePosition(D);
 			Buffer.FlushData();

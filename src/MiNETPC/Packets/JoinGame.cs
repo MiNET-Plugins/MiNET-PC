@@ -22,7 +22,7 @@ namespace MiNETPC.Packages
 			Buffer.WriteInt(Player.EntityId);
 			Buffer.WriteByte((byte) Player.Gamemode);
 			Buffer.WriteByte(Player.Dimension);
-			Buffer.WriteByte((byte) PluginGlobals.Level.Difficulty);
+			Buffer.WriteByte((byte) PluginGlobals.Level[0].Difficulty);
 			Buffer.WriteByte((byte) PluginGlobals.MaxPlayers);
 			Buffer.WriteString("flat");
 			Buffer.WriteBool(false);

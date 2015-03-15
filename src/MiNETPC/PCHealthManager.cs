@@ -172,7 +172,7 @@ namespace MiNETPC
 				Z = (int)Math.Floor(playerPosition.Z)
 			};
 
-			var block = PluginGlobals.Level.GetBlock(waterPos);
+			var block = PluginGlobals.Level[0].GetBlock(waterPos);
 
 			if (block == null || (block.Id != 8 && block.Id != 9)) return false;
 
@@ -181,7 +181,7 @@ namespace MiNETPC
 
 		private bool IsInLava(PlayerLocation playerPosition)
 		{
-			var block = PluginGlobals.Level.GetBlock(playerPosition);
+			var block = PluginGlobals.Level[0].GetBlock(playerPosition);
 
 			if (block == null || (block.Id != 10 && block.Id != 11)) return false;
 

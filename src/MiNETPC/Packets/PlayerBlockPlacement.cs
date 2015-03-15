@@ -65,7 +65,7 @@ namespace MiNETPC.Packages
 			var b = BlockFactory.GetBlockById(PluginGlobals.GetBlockId(heldItem));
 			b.Coordinates = position;
 			b.Metadata = itemMeta;
-			PluginGlobals.Level.SetBlock(b);
+			PluginGlobals.Level[0].SetBlock(b);
 
 			PluginGlobals.SendBlockUpdate(position, PluginGlobals.GetBlockId(heldItem), itemMeta);
 		}

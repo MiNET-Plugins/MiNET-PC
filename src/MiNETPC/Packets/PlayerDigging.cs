@@ -26,8 +26,8 @@ namespace MiNETPC.Packages
 				var face = Buffer.ReadByte();
 				var intVector = new Vector3((int) position.X, (int) position.Y, (int) position.Z);
 
-				var block = PluginGlobals.Level.GetBlock(intVector);
-				block.BreakBlock(PluginGlobals.Level);
+				var block = PluginGlobals.Level[0].GetBlock(intVector);
+				block.BreakBlock(PluginGlobals.Level[0]);
 				//Globals.Level.SetBlock(new BlockAir() {Coordinates = intVector});
 				Client.Player.Digging = false;
 

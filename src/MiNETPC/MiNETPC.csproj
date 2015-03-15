@@ -35,7 +35,7 @@
   <ItemGroup>
     <Reference Include="MiNET, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\MiNET\MiNET.Service\bin\Debug\MiNET.dll</HintPath>
+      <HintPath>..\..\..\MiNET\src\MiNET\MiNET.Service\bin\Debug\MiNET.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

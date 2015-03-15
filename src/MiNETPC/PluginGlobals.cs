@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using MiNET.Plugins;
 using MiNET.Utils;
 using MiNET.Worlds;
 using MiNETPC.Classes;
@@ -12,18 +13,19 @@ namespace MiNETPC
 	class PluginGlobals
 	{
 		public static TcpListener ServerListener = new TcpListener(IPAddress.Any, 25565);
-		public static Level Level;
+		public static List<Level> Level;
 		public static List<Player> PcPlayers = new List<Player>();
 		public static List<Player> PePlayers = new List<Player>(); 
 		public static Dictionary<string, string> Users = new Dictionary<string, string>();
+		public static PluginContext PluginContext;
 
 		public static int LastEntityId = 0;
 		public static string ProtocolName = "MiNET PC 1.8";
 		public static int ProtocolVersion = 47;
 		public static int MaxPlayers = 10;
 		public static string Motd = "MiNET TEST";
-		public static int PeidOffset = 10000;
-		public static int PcidOffset = 50000;
+		public static int PeidOffset = 10000000;
+		public static int PcidOffset = 50000000;
 		private static List<int> _gaps;
 		private static List<int> _ignore;
 
@@ -48,7 +50,7 @@ namespace MiNETPC
 
 		public static void SendChunk(ChunkCoordinates position)
 		{
-			ChunkColumn targetchunk = Level._worldProvider.GenerateChunkColumn(position);
+			ChunkColumn targetchunk = Level[0]._worldProvider.GenerateChunkColumn(position);
 			PcChunkColumn converted = new PcChunkColumn {X = position.X, Z = position.Z};
 			converted.Pe2Pc(targetchunk);
 
@@ -183,11 +185,19 @@ namespace MiNETPC
 			return GetPlayers().FirstOrDefault(i => i.EntityId == entityId);
 		}
 
-		public static void BroadcastChat(string message)
+		public static void BroadcastChat(string message, bool pocketEdition = false)
 		{
 			foreach (Player player in PcPlayers)
 			{
 				new ChatMessage(player.Wrapper) {Message = message}.Write();
+			}
+
+			if (pocketEdition)
+			{
+				foreach (MiNET.Player player in Level[0].GetSpawnedPlayers())
+				{
+					player.SendMessage(message, null);
+				}
 			}
 		}
 	}

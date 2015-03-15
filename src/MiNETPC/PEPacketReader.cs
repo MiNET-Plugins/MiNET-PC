@@ -1,21 +1,19 @@
 ﻿using System;
 using MiNET.Net;
-using MiNET.PluginSystem.Attributes;
+using MiNET.Plugins.Attributes;
 using MiNET.Utils;
 using MiNET.Worlds;
 using MiNETPC.Classes;
 using MiNETPC.Packages;
-using Package = MiNET.Net.Package;
 using Player = MiNET.Player;
 
 namespace MiNETPC
 {
-	public class PePacketReader
+	public partial class MiNetpc
 	{
-		[HandlePacket(typeof(McpeAnimate))]
-		public void HandleAnimation(Package packet, Player source)
+		[PacketHandler, Receive]
+		public void HandleAnimation(McpeAnimate data, Player source)
 		{
-			McpeAnimate data = (McpeAnimate) packet;
 			if (data.actionId == 1)
 			{
 				var tar = PluginGlobals.GetPlayer(source.EntityId + PluginGlobals.PeidOffset);
@@ -26,37 +24,34 @@ namespace MiNETPC
 			}
 		}
 
-		[HandlePacket(typeof(McpeMessage))]
-		public void HandleChatPacket(Package packet, Player source)
+		[PacketHandler, Receive]
+		public void HandleChatPacket(McpeMessage data, Player source)
 		{
-			McpeMessage data = (McpeMessage) packet;
-			if (data.message.StartsWith("/")) return; //Do not show commands in chat!!!
+			if (data.message.StartsWith("/") || data.message.StartsWith(".")) return; //Do not show commands in chat!!!
 
 			PluginGlobals.BroadcastChat("<" + source.Username + "> " + data.message.Replace("\\", "\\\\").Replace("\"", "\'\'"));
 		}
 
-		[HandleSendPacket(typeof (McpeUpdateBlock))]
-		public void ChangeBlockHandler(Package packet, Player source)
+		[PacketHandler, Send]
+		public void ChangeBlockHandler(McpeUpdateBlock packet, Player source)
 		{
-			McpeUpdateBlock data = (McpeUpdateBlock) packet;
-			ChunkCoordinates target = new ChunkCoordinates(data.x >> 4, data.z >> 4);
-			ChunkColumn targetchunk = PluginGlobals.Level._worldProvider.GenerateChunkColumn(target);
-			PcChunkColumn converted = new PcChunkColumn { X = target.X, Z = target.Z };
+			//ChunkCoordinates target = new ChunkCoordinates(packet.x >> 4, packet.z >> 4);
+			//ChunkColumn targetchunk = PluginGlobals.Level[0]._worldProvider.GenerateChunkColumn(target);
+			//PcChunkColumn converted = new PcChunkColumn { X = target.X, Z = target.Z };
 
-			converted.Pe2Pc(targetchunk);
+			//converted.Pe2Pc(targetchunk);
 
 			//foreach (var player in PluginGlobals.PcPlayers)
 			//{
 				//new BlockChange(player.Wrapper, new MSGBuffer(player.Wrapper)) {BlockID = data.block, MetaData = data.meta, Location = new Vector3(data.x, data.y, data.z)}.Write();
 				//new ChunkData(player.Wrapper){ Chunk = converted, Quee = false}.Write();
 			//}
-			PluginGlobals.SendBlockUpdate(new Vector3(data.x, data.y, data.z), PluginGlobals.GetBlockId(data.block), data.meta);
+			PluginGlobals.SendBlockUpdate(new Vector3(packet.x, packet.y, packet.z), PluginGlobals.GetBlockId(packet.block), packet.meta);
 		}
 
-		[HandlePacket(typeof (McpeMovePlayer))]
-		public void HandleMovePacket(Package packet, Player source)
+		[PacketHandler, Receive]
+		public void HandleMovePacket(McpeMovePlayer data, Player source)
 		{
-			McpeMovePlayer data = (McpeMovePlayer) packet;
 			if (PluginGlobals.GetPlayer(PluginGlobals.PeidOffset + data.entityId) != null)
 			{
 				PluginGlobals.GetPlayer(PluginGlobals.PeidOffset + data.entityId).Coordinates = new Vector3(data.x, data.y, data.z);
@@ -77,8 +72,8 @@ namespace MiNETPC
 			}
 		}
 
-		[HandlePlayerDisconnect]
-		public void HandleDisconnect(Player player)
+		[PacketHandler, Receive]
+		public void HandleDisconnect(DisconnectionNotification data, Player player)
 		{
 			foreach (var playerd in PluginGlobals.PePlayers)
 			{
@@ -94,8 +89,8 @@ namespace MiNETPC
 			PluginGlobals.BroadcastChat("\\u00A7e" + player.Username + " has left the game!");
 		}
 
-		[HandlePlayerLogin]
-		public void HandleLogin(Player player)
+		[PacketHandler, Send]
+		public void HandleLogin(McpeStartGame data, Player player)
 		{
 			var p = new Classes.Player
 			{
@@ -114,31 +109,6 @@ namespace MiNETPC
 				//PluginGlobals.Level.SendAddForPlayer(targetPlayer, this);
 				//PluginGlobals.Level.SendAddForPlayer(newPlayer, targetPlayer);
 
-				foreach (var pc in PluginGlobals.PcPlayers) //Send PC players to PE
-				{
-					player.SendPackage(new McpeAddPlayer
-					{
-						clientId = 0,
-						username = pc.Username,
-						entityId = PluginGlobals.PcidOffset + pc.EntityId,
-						x = (float) pc.Coordinates.X,
-						y = (float) pc.Coordinates.Y,
-						z = (float) pc.Coordinates.Z,
-						yaw = (byte) pc.Yaw,
-						pitch = (byte) pc.Pitch,
-						metadata = new byte[0]
-					});
-
-					player.SendPackage(new McpeAddEntity
-					{
-						entityType = -1,
-						entityId = PluginGlobals.PcidOffset + pc.EntityId,
-						x = (float) pc.Coordinates.X,
-						y = (float)pc.Coordinates.Y,
-						z = (float)pc.Coordinates.Z,
-					});
-				}
-
 				foreach (var playerd in PluginGlobals.PcPlayers) //Send PE Players to PC
 				{
 					new PlayerListItem(playerd.Wrapper)
@@ -155,16 +125,42 @@ namespace MiNETPC
 					}.Write();
 				}
 
+				 foreach (var pc in PluginGlobals.PcPlayers) //Send PC players to PE
+				 {
+					player.SendPackage(new McpeAddPlayer
+					{
+						clientId = 0,
+						username = pc.Username,
+						entityId = PluginGlobals.PcidOffset + pc.EntityId,
+						x = (float)pc.Coordinates.X,
+						y = (float)pc.Coordinates.Y,
+						z = (float)pc.Coordinates.Z,
+						yaw = (byte)pc.Yaw,
+						pitch = (byte)pc.Pitch,
+						metadata = new byte[0]
+					});
+
+					player.SendPackage(new McpeAddEntity
+					{
+						entityType = -1,
+						entityId = PluginGlobals.PcidOffset + pc.EntityId,
+						x = (float)pc.Coordinates.X,
+						y = (float)pc.Coordinates.Y,
+						z = (float)pc.Coordinates.Z,
+					});
+				}
+
 			PluginGlobals.BroadcastChat("\\u00A7e" + player.Username + " joined the game!");
 		}
 
-		[OnPlayerInteract]
-		public void PlayerAttacked(int entityId)
+		[PacketHandler, Receive]
+		public void PlayerAttacked(McpeInteract data, Player source)
 		{
-			if (entityId >= PluginGlobals.PcidOffset)
+			Console.WriteLine("Target Entity: " + data.targetEntityId);
+			if (data.targetEntityId != source.EntityId && data.targetEntityId >= PluginGlobals.PcidOffset)
 			{
-				entityId -= PluginGlobals.PcidOffset;
-				var target = PluginGlobals.GetPlayer(entityId);
+				//data.entityId -= PluginGlobals.PcidOffset;
+				var target = PluginGlobals.GetPlayer(data.entityId);
 				target.HealthManager.TakeHit(null);
 			}
 		}

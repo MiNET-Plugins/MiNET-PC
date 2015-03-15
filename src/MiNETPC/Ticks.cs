@@ -57,7 +57,7 @@ namespace MiNETPC
 		{
 			foreach (var i in PluginGlobals.PcPlayers)
 			{
-				new TimeUpdate(i.Wrapper) { Time = PluginGlobals.Level.CurrentWorldTime, Day = 0 }.Write();
+				new TimeUpdate(i.Wrapper) { Time = PluginGlobals.Level[0].CurrentWorldTime, Day = 0 }.Write();
 			}
 		}
 

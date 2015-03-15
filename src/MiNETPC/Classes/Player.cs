@@ -50,7 +50,7 @@ namespace MiNETPC.Classes
 		{
 			_chunksUsed = new Dictionary<Tuple<int, int>, ChunkColumn>();
 			HealthManager = new PCHealthManager(this);
-			if (PlayerEntity == null) PlayerEntity = new MiNET.Player(null, null, PluginGlobals.Level, -1);
+			if (PlayerEntity == null) PlayerEntity = new MiNET.Player(null, null, PluginGlobals.Level[0], null, -1);
 			PlayerInventory = new PlayerInventory(this);
 		}
 
@@ -81,7 +81,7 @@ namespace MiNETPC.Classes
 
 				foreach (
 					var chunk in
-						PluginGlobals.Level.GenerateChunks(new ChunkCoordinates((int) Coordinates.X, (int) Coordinates.Z),
+						PluginGlobals.Level[0].GenerateChunks(new ChunkCoordinates((int) Coordinates.X, (int) Coordinates.Z),
 							force ? new Dictionary<Tuple<int, int>, ChunkColumn>() : _chunksUsed))
 				{
 					PcChunkColumn pcchunk = new PcChunkColumn {X = chunk.x, Z = chunk.z};
@@ -101,7 +101,7 @@ namespace MiNETPC.Classes
 						IsSpawned = true;
 						PluginGlobals.PcPlayers.Add(this);
 
-						foreach (var targetPlayer in PluginGlobals.Level.Players)
+						foreach (var targetPlayer in PluginGlobals.Level[0].Players)
 						{
 							targetPlayer.SendPackage( new McpeAddPlayer
 								{
@@ -116,7 +116,7 @@ namespace MiNETPC.Classes
 									metadata = new byte[0]
 								});
 
-							PluginGlobals.Level.RelayBroadcast(new McpeAddEntity
+							PluginGlobals.Level[0].RelayBroadcast(new McpeAddEntity
 							{
 								entityType = -1,
 								entityId = PluginGlobals.PcidOffset + EntityId,
@@ -147,7 +147,7 @@ namespace MiNETPC.Classes
 
 						SendMovePlayer();
 
-						PluginGlobals.Level.BroadcastTextMessage(Username  + " joined the game!");
+						PluginGlobals.Level[0].BroadcastTextMessage(Username  + " joined the game!");
 					}
 					counted++;
 				}
@@ -166,7 +166,7 @@ namespace MiNETPC.Classes
 			package.bodyYaw = Yaw;
 			package.teleport = 0x80;
 
-			foreach (MiNET.Player pl in PluginGlobals.Level.GetSpawnedPlayers())
+			foreach (MiNET.Player pl in PluginGlobals.Level[0].GetSpawnedPlayers())
 			{
 				pl.SendPackage(package);
 			}

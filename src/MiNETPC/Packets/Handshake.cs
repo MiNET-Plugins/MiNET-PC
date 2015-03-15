@@ -72,7 +72,7 @@ namespace MiNETPC.Packages
 
 			PluginGlobals.LastEntityId++;
 
-			var p = new Player(null, null, PluginGlobals.Level, 5); //For later usage ;P
+			var p = new Player(null, null, PluginGlobals.Level[0], null, 5); //For later usage ;P
 			//PluginGlobals.Level.AddPlayer(p);
 
 			Client.Player = new Classes.Player

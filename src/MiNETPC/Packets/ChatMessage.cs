@@ -23,7 +23,7 @@ namespace MiNETPC.Packages
 		public override void Read()
 		{
 			Message = Buffer.ReadString();
-			PluginGlobals.Level.BroadcastTextMessage("<" + Client.Player.Username + "> " +
+			PluginGlobals.Level[0].BroadcastTextMessage("<" + Client.Player.Username + "> " +
 			                                         Message.Replace("\\", "\\\\").Replace("\"", "\'\'"));
 			PluginGlobals.BroadcastChat("<" + Client.Player.Username + "> " + Message.Replace("\\", "\\\\").Replace("\"", "\'\'"));
 		}
