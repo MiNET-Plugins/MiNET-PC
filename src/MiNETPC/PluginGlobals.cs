@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using log4net;
+using MiNET.Net;
 using MiNET.Plugins;
 using MiNET.Utils;
 using MiNET.Worlds;
@@ -12,6 +14,7 @@ namespace MiNETPC
 {
 	class PluginGlobals
 	{
+		public static readonly ILog Log = LogManager.GetLogger(typeof(MiNetpc));
 		public static TcpListener ServerListener = new TcpListener(IPAddress.Any, 25565);
 		public static List<Level> Level;
 		public static List<Player> PcPlayers = new List<Player>();
@@ -185,19 +188,21 @@ namespace MiNETPC
 			return GetPlayers().FirstOrDefault(i => i.EntityId == entityId);
 		}
 
-		public static void BroadcastChat(string message, bool pocketEdition = false)
+		public static void BroadcastChat(string message, string sender = null, bool pocketEdition = false)
 		{
-			foreach (Player player in PcPlayers)
-			{
-				new ChatMessage(player.Wrapper) {Message = message}.Write();
-			}
-
 			if (pocketEdition)
 			{
 				foreach (MiNET.Player player in Level[0].GetSpawnedPlayers())
 				{
-					player.SendMessage(message, null);
+					var d = new McpeMessage() {message = message, source = sender};
+					player.SendPackage(d);
 				}
+			}
+
+			if (sender != null) message = "<" + sender + "> " + message;
+			foreach (Player player in PcPlayers)
+			{
+				new ChatMessage(player.Wrapper) { Message = message }.Write();
 			}
 		}
 	}
